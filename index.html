@@ -167,23 +167,24 @@
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             line-height: 1.6;
-            font-family: 'Times New Roman', serif;
+            font-family: Calibri, sans-serif;
         }
 
         .document-preview h3 {
             color: #1b5e20;
             text-align: center;
-            font-size: 1.4em;
+            font-size: 1.8em;
             font-weight: bold;
             text-transform: uppercase;
         }
 
         .header-box {
             border: 2px solid #000;
-            padding: 15px;
+            padding: 20px;
             margin: 20px 0;
             text-align: center;
             font-weight: bold;
+            background-color: #d3d3d3;
         }
 
         .download-btn {
@@ -365,9 +366,7 @@ Cidade: Oliveira</textarea>
                         
                         <p>Considerando o número de animais envolvidos (<span class="placeholder">[NUM_ANIMAIS]</span> <span class="placeholder">[TIPO_ANIMAL]</span>) e a vinculação do valor de 25 UFEMGs/animal, para efeito de cálculo do valor da multa a ser aplicada, conforme § 1° do artigo 7° da Lei 10.021 de 06 de dezembro de 1989,</p>
 
-                        <div class="header-box">
-                            <p><strong>DECIDO PELA APLICAÇÃO DA PENALIDADE DE MULTA NO VALOR DE <span class="placeholder">[VALOR_UFEMG]</span> (<span class="placeholder">[VALOR_EXTENSO]</span>) UFEMGs.</strong></p>
-                        </div>
+                        <p class="center bold">DECIDO PELA APLICAÇÃO DA PENALIDADE DE MULTA NO VALOR DE <span class="placeholder">[VALOR_UFEMG]</span> (<span class="placeholder">[VALOR_EXTENSO]</span>) UFEMGs.</p>
 
                         <p class="center"><strong><span class="placeholder">[MUNICIPIO]</span>, <span class="placeholder">[DATA_DECISAO]</span>.</strong></p>
                         
@@ -562,7 +561,7 @@ Cidade: Oliveira</textarea>
                 'oficio': 'Ofício de Comunicação'
             };
 
-            const { Document, Packer, Paragraph, TextRun, AlignmentType, BorderStyle } = docx;
+            const { Document, Packer, Paragraph, TextRun, AlignmentType, BorderStyle, ShadingType } = docx;
 
             const dataHoje = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
             const dataAuto = new Date(dadosProcesso.dataAuto).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
@@ -572,70 +571,70 @@ Cidade: Oliveira</textarea>
             if (tipoDoc === 'decisao') {
                 paragraphs = [
                     new Paragraph({
-                        children: [new TextRun({ text: "DECISÃO ADMINISTRATIVA", bold: true, size: 24 })],
+                        children: [new TextRun({ text: "DECISÃO ADMINISTRATIVA", bold: true, size: 36, font: "Calibri" })],
                         alignment: AlignmentType.CENTER,
                         border: { top: { style: BorderStyle.SINGLE, size: 6 }, bottom: { style: BorderStyle.SINGLE, size: 6 }, left: { style: BorderStyle.SINGLE, size: 6 }, right: { style: BorderStyle.SINGLE, size: 6 } },
+                        shading: { fill: "D3D3D3", type: ShadingType.CLEAR },
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: `Processo: ${dadosProcesso.numeroProcesso}`, bold: true, size: 24 })],
+                        children: [new TextRun({ text: `Processo: ${dadosProcesso.numeroProcesso}`, bold: true, size: 24, font: "Calibri" })],
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: `Interessado: ${dadosProcesso.interessado}`, bold: true, size: 24 })],
+                        children: [new TextRun({ text: `Interessado: ${dadosProcesso.interessado}`, bold: true, size: 24, font: "Calibri" })],
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: `CPF/CNPJ nº: ${dadosProcesso.cpfCnpj}`, bold: true, size: 24 })],
+                        children: [new TextRun({ text: `CPF/CNPJ nº: ${dadosProcesso.cpfCnpj}`, bold: true, size: 24, font: "Calibri" })],
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: `Auto de Infração nº: ${dadosProcesso.numeroAuto} de ${dataAuto}.`, bold: true, size: 24 })],
+                        children: [new TextRun({ text: `Auto de Infração nº: ${dadosProcesso.numeroAuto} de ${dataAuto}.`, bold: true, size: 24, font: "Calibri" })],
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: "No exercício da competência a mim delegada pelo Diretor-Geral do Instituto Mineiro de Agropecuária-IMA, conforme Portaria IMA nº 2375, de 05 de maio de 2025, uma vez analisados aos autos do processo em referência e tudo achado conforme a lei e o direito, e", size: 24 })],
+                        children: [new TextRun({ text: "No exercício da competência a mim delegada pelo Diretor-Geral do Instituto Mineiro de Agropecuária-IMA, conforme Portaria IMA nº 2375, de 05 de maio de 2025, uma vez analisados aos autos do processo em referência e tudo achado conforme a lei e o direito, e", size: 24, font: "Calibri" })],
                         alignment: AlignmentType.JUSTIFIED,
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: `Considerando que não houve apresentação de defesa ao Auto de Infração acima referenciado, e que foi lavrada a Certidão de Revelia de fls. ${dadosProcesso.folhasRevelia},`, size: 24 })],
+                        children: [new TextRun({ text: `Considerando que não houve apresentação de defesa ao Auto de Infração acima referenciado, e que foi lavrada a Certidão de Revelia de fls. ${dadosProcesso.folhasRevelia},`, size: 24, font: "Calibri" })],
                         alignment: AlignmentType.JUSTIFIED,
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: `Considerando tratar-se de infração: “Deixar de vacinar animais, (${dadosProcesso.tipoAnimal}) contra febre aftosa”, e sendo esta a irregularidade constatada pela autoridade fiscalizadora,`, size: 24 })],
+                        children: [new TextRun({ text: `Considerando tratar-se de infração: “Deixar de vacinar animais, (${dadosProcesso.tipoAnimal}) contra febre aftosa”, e sendo esta a irregularidade constatada pela autoridade fiscalizadora,`, size: 24, font: "Calibri" })],
                         alignment: AlignmentType.JUSTIFIED,
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: `Considerando o número de animais envolvidos (${dadosProcesso.numeroAnimais} ${dadosProcesso.tipoAnimal}) e a vinculação do valor de 25 UFEMGs/animal, para efeito de cálculo do valor da multa a ser aplicada, conforme § 1° do artigo 7° da Lei 10.021 de 06 de dezembro de 1989,`, size: 24 })],
+                        children: [new TextRun({ text: `Considerando o número de animais envolvidos (${dadosProcesso.numeroAnimais} ${dadosProcesso.tipoAnimal}) e a vinculação do valor de 25 UFEMGs/animal, para efeito de cálculo do valor da multa a ser aplicada, conforme § 1° do artigo 7° da Lei 10.021 de 06 de dezembro de 1989,`, size: 24, font: "Calibri" })],
                         alignment: AlignmentType.JUSTIFIED,
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: `DECIDO PELA APLICAÇÃO DA PENALIDADE DE MULTA NO VALOR DE ${dadosProcesso.valorUFEMG} (${dadosProcesso.valorPorExtenso}) UFEMGs.`, bold: true, size: 24 })],
-                        alignment: AlignmentType.CENTER,
-                        border: { top: { style: BorderStyle.SINGLE, size: 6 }, bottom: { style: BorderStyle.SINGLE, size: 6 }, left: { style: BorderStyle.SINGLE, size: 6 }, right: { style: BorderStyle.SINGLE, size: 6 } },
-                        spacing: { before: 240, after: 240 }
-                    }),
-                    new Paragraph({
-                        children: [new TextRun({ text: `${dadosProcesso.municipio}, ${dataHoje}.`, bold: true, size: 24 })],
+                        children: [new TextRun({ text: `DECIDO PELA APLICAÇÃO DA PENALIDADE DE MULTA NO VALOR DE ${dadosProcesso.valorUFEMG} (${dadosProcesso.valorPorExtenso}) UFEMGs.`, bold: true, size: 24, font: "Calibri" })],
                         alignment: AlignmentType.CENTER,
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: "Coordenador Regional", size: 24 })],
+                        children: [new TextRun({ text: `${dadosProcesso.municipio}, ${dataHoje}.`, bold: true, size: 24, font: "Calibri" })],
                         alignment: AlignmentType.CENTER,
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: `Coordenadoria Regional de ${dadosProcesso.coordenadoria}`, size: 24 })],
+                        children: [new TextRun({ text: "Coordenador Regional", size: 24, font: "Calibri" })],
                         alignment: AlignmentType.CENTER,
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: "Instituto Mineiro de Agropecuária", size: 24 })],
+                        children: [new TextRun({ text: `Coordenadoria Regional de ${dadosProcesso.coordenadoria}`, size: 24, font: "Calibri" })],
+                        alignment: AlignmentType.CENTER,
+                        spacing: { before: 240, after: 240 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: "Instituto Mineiro de Agropecuária", size: 24, font: "Calibri" })],
                         alignment: AlignmentType.CENTER,
                         spacing: { before: 240, after: 240 }
                     })
@@ -644,116 +643,116 @@ Cidade: Oliveira</textarea>
                 const enderecoLinhas = dadosProcesso.enderecoCompleto.split('\n');
                 paragraphs = [
                     new Paragraph({
-                        children: [new TextRun({ text: "OF. CR. n. ___/___", bold: true, size: 24 })],
+                        children: [new TextRun({ text: "OF. CR. n. ___/___", bold: true, size: 24, font: "Calibri" })],
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: `${dadosProcesso.municipio}, ${dataHoje}.`, size: 24 })],
+                        children: [new TextRun({ text: `${dadosProcesso.municipio}, ${dataHoje}.`, size: 24, font: "Calibri" })],
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: `Senhor(a) ${dadosProcesso.interessado},`, bold: true, size: 24 })],
+                        children: [new TextRun({ text: `Senhor(a) ${dadosProcesso.interessado},`, bold: true, size: 24, font: "Calibri" })],
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: `Pelo presente, notificamos que foi JULGADO PROCEDENTE o Auto de Infração nº ${dadosProcesso.numeroAuto}, de ${dataAuto}, nos termos do Decisão Administrativa anexo referente ao processo administrativo n° ${dadosProcesso.numeroProcesso}.`, size: 24 })],
+                        children: [new TextRun({ text: `Pelo presente, notificamos que foi JULGADO PROCEDENTE o Auto de Infração nº ${dadosProcesso.numeroAuto}, de ${dataAuto}, nos termos do Decisão Administrativa anexo referente ao processo administrativo n° ${dadosProcesso.numeroProcesso}.`, size: 24, font: "Calibri" })],
                         alignment: AlignmentType.JUSTIFIED,
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
                         children: [
-                            new TextRun({ text: "Salientamos que a não apresentação de recurso à penalidade imposta no prazo de até ", size: 24 }),
-                            new TextRun({ text: "20 (vinte) dias", bold: true, size: 24 }),
-                            new TextRun({ text: " contados do recebimento desta comunicação, a decisão administrativa tornar-se-á definitiva.", size: 24 })
+                            new TextRun({ text: "Salientamos que a não apresentação de recurso à penalidade imposta no prazo de até ", size: 24, font: "Calibri" }),
+                            new TextRun({ text: "20 (vinte) dias", bold: true, size: 24, font: "Calibri" }),
+                            new TextRun({ text: " contados do recebimento desta comunicação, a decisão administrativa tornar-se-á definitiva.", size: 24, font: "Calibri" })
                         ],
                         alignment: AlignmentType.JUSTIFIED,
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: "O referido recurso deverá conter:", bold: true, size: 24 })],
+                        children: [new TextRun({ text: "O referido recurso deverá conter:", bold: true, size: 24, font: "Calibri" })],
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: "1. identificação completa do autuado ou de seu procurador com cópia do RG e CPF ou CNPJ (cópia da última alteração do contrato social);", size: 24 })],
+                        children: [new TextRun({ text: "1. identificação completa do autuado ou de seu procurador com cópia do RG e CPF ou CNPJ (cópia da última alteração do contrato social);", size: 24, font: "Calibri" })],
                         alignment: AlignmentType.JUSTIFIED,
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: "2. identificação do Auto de Infração – número, série e data da lavratura do Auto de Infração;", size: 24 })],
+                        children: [new TextRun({ text: "2. identificação do Auto de Infração – número, série e data da lavratura do Auto de Infração;", size: 24, font: "Calibri" })],
                         alignment: AlignmentType.JUSTIFIED,
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: "3. identificação do número do Processo – número do Processo;", size: 24 })],
+                        children: [new TextRun({ text: "3. identificação do número do Processo – número do Processo;", size: 24, font: "Calibri" })],
                         alignment: AlignmentType.JUSTIFIED,
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: "4. cópia de comprovante de endereço urbano do autuado, emitido a menos de sessenta dias ou cópia do comprovante de endereço urbano de terceiros para recebimento de correspondência, declarado por ambas as partes;", size: 24 })],
+                        children: [new TextRun({ text: "4. cópia de comprovante de endereço urbano do autuado, emitido a menos de sessenta dias ou cópia do comprovante de endereço urbano de terceiros para recebimento de correspondência, declarado por ambas as partes;", size: 24, font: "Calibri" })],
                         alignment: AlignmentType.JUSTIFIED,
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: "5. exposição dos fatos e considerações de forma explícita, especificando também as provas que pretende produzir. Não será considerado como recurso apenas a apresentação de documentos como a declaração de vacina, ficha sanitária ou outros;", size: 24 })],
+                        children: [new TextRun({ text: "5. exposição dos fatos e considerações de forma explícita, especificando também as provas que pretende produzir. Não será considerado como recurso apenas a apresentação de documentos como a declaração de vacina, ficha sanitária ou outros;", size: 24, font: "Calibri" })],
                         alignment: AlignmentType.JUSTIFIED,
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: "6. data e assinatura do autuado ou do seu procurador. Quando feito por procurador, é indispensável a apresentação da procuração;", size: 24 })],
+                        children: [new TextRun({ text: "6. data e assinatura do autuado ou do seu procurador. Quando feito por procurador, é indispensável a apresentação da procuração;", size: 24, font: "Calibri" })],
                         alignment: AlignmentType.JUSTIFIED,
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: "7. O referido recurso deverá ser endereçado a:", size: 24 })],
+                        children: [new TextRun({ text: "7. O referido recurso deverá ser endereçado a:", size: 24, font: "Calibri" })],
                         alignment: AlignmentType.JUSTIFIED,
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: "Instituto Mineiro de Agropecuária", bold: true, size: 24 })],
+                        children: [new TextRun({ text: "Instituto Mineiro de Agropecuária", bold: true, size: 24, font: "Calibri" })],
                         spacing: { before: 240, after: 240 },
                         border: { top: { style: BorderStyle.SINGLE, size: 2 }, bottom: { style: BorderStyle.SINGLE, size: 2 }, left: { style: BorderStyle.SINGLE, size: 2 }, right: { style: BorderStyle.SINGLE, size: 2 } }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: "A/C Diretor-Geral do Instituto Mineiro de Agropecuária", size: 24 })],
+                        children: [new TextRun({ text: "A/C Diretor-Geral do Instituto Mineiro de Agropecuária", size: 24, font: "Calibri" })],
                         spacing: { before: 240, after: 240 },
                         border: { bottom: { style: BorderStyle.SINGLE, size: 2 }, left: { style: BorderStyle.SINGLE, size: 2 }, right: { style: BorderStyle.SINGLE, size: 2 } }
                     }),
-                    ...enderecoLinhas.map(linha => new Paragraph({
-                        children: [new TextRun({ text: linha.trim(), size: 24 })],
+                    ...dadosProcesso.enderecoCompleto.split('\n').map(linha => new Paragraph({
+                        children: [new TextRun({ text: linha.trim(), size: 24, font: "Calibri" })],
                         spacing: { before: 240, after: 240 },
                         border: { bottom: { style: BorderStyle.SINGLE, size: 2 }, left: { style: BorderStyle.SINGLE, size: 2 }, right: { style: BorderStyle.SINGLE, size: 2 } }
                     })),
                     new Paragraph({
-                        children: [new TextRun({ text: "Observação: Caso o autuado seja falecido, apresentar no endereço indicado acima (item 7 acima), a identificação completa do inventariante ou herdeiros (certidão de óbito, termo de inventariança OU partilha) e endereço urbano para contato.", bold: true, size: 24 })],
+                        children: [new TextRun({ text: "Observação: Caso o autuado seja falecido, apresentar no endereço indicado acima (item 7 acima), a identificação completa do inventariante ou herdeiros (certidão de óbito, termo de inventariança OU partilha) e endereço urbano para contato.", bold: true, size: 24, font: "Calibri" })],
                         alignment: AlignmentType.JUSTIFIED,
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: "Atenciosamente,", size: 24 })],
+                        children: [new TextRun({ text: "Atenciosamente,", size: 24, font: "Calibri" })],
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: `Coordenadoria Regional ${dadosProcesso.coordenadoria}`, bold: true, size: 24 })],
+                        children: [new TextRun({ text: `Coordenadoria Regional ${dadosProcesso.coordenadoria}`, bold: true, size: 24, font: "Calibri" })],
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: "Instituto Mineiro de Agropecuária-IMA", bold: true, size: 24 })],
+                        children: [new TextRun({ text: "Instituto Mineiro de Agropecuária-IMA", bold: true, size: 24, font: "Calibri" })],
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: "Carimbo / MASP / Assinatura", size: 24 })],
+                        children: [new TextRun({ text: "Carimbo / MASP / Assinatura", size: 24, font: "Calibri" })],
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: "Ao(À) Senhor(a)", bold: true, size: 24 })],
+                        children: [new TextRun({ text: "Ao(À) Senhor(a)", bold: true, size: 24, font: "Calibri" })],
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: dadosProcesso.interessado, size: 24 })],
+                        children: [new TextRun({ text: dadosProcesso.interessado, size: 24, font: "Calibri" })],
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: `${dadosProcesso.municipio}-MG`, size: 24 })],
+                        children: [new TextRun({ text: `${dadosProcesso.municipio}-MG`, size: 24, font: "Calibri" })],
                         spacing: { before: 240, after: 240 }
                     })
                 ];
