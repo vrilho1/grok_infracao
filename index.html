@@ -1,0 +1,786 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Documentos - IMA</title>
+    <script src="https://unpkg.com/docx@7.8.2/build/index.js"></script>
+    <script src="https://unpkg.com/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2d7d32 0%, #388e3c 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            min-height: 600px;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-right: 1px solid #e0e0e0;
+            overflow-y: auto;
+        }
+
+        .form-section h2 {
+            color: #2e7d32;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            border-bottom: 3px solid #4caf50;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #1b5e20;
+            font-size: 0.9em;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 0.95em;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #4caf50;
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.3);
+        }
+
+        .documents-section {
+            background: white;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .document-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .tab {
+            padding: 12px 18px;
+            background: #ecf0f1;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: #7f8c8d;
+            border-radius: 8px 8px 0 0;
+            margin-right: 5px;
+        }
+
+        .tab.active {
+            background: #4caf50;
+            color: white;
+        }
+
+        .document-content {
+            display: none;
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+        }
+
+        .document-content.active {
+            display: block;
+        }
+
+        .document-preview {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            line-height: 1.6;
+            font-family: 'Times New Roman', serif;
+        }
+
+        .document-preview h3 {
+            color: #1b5e20;
+            text-align: center;
+            font-size: 1.4em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .header-box {
+            border: 2px solid #000;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+            margin-top: 15px;
+        }
+
+        .placeholder {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-incomplete {
+            background-color: #f44336;
+        }
+
+        .status-complete {
+            background-color: #4caf50;
+        }
+
+        .info-box {
+            background: #e8f5e8;
+            border: 1px solid #4caf50;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 1200px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏛️ Sistema de Documentos IMA</h1>
+            <p>Instituto Mineiro de Agropecuária - Geração Automatizada de Processos</p>
+        </div>
+
+        <div class="content">
+            <div class="form-section">
+                <h2>📋 Dados do Processo</h2>
+                <form id="processoForm">
+                    <div class="form-group">
+                        <label for="numeroProcesso">Número do Processo:</label>
+                        <input type="text" id="numeroProcesso" name="numeroProcesso" placeholder="XXXX/GDA/XXX/XXXX">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="interessado">Interessado/Autuado:</label>
+                        <input type="text" id="interessado" name="interessado" placeholder="Nome completo ou Razão Social">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cpfCnpj">CPF/CNPJ:</label>
+                        <input type="text" id="cpfCnpj" name="cpfCnpj" placeholder="000.000.000-00 ou 00.000.000/0001-00">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="numeroAuto">Número do Auto de Infração:</label>
+                        <input type="text" id="numeroAuto" name="numeroAuto" placeholder="XXXXXX">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dataAuto">Data do Auto:</label>
+                        <input type="date" id="dataAuto" name="dataAuto">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="numeroAnimais">Número de Animais:</label>
+                        <input type="number" id="numeroAnimais" name="numeroAnimais" placeholder="XX" min="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tipoAnimal">Tipo de Animal:</label>
+                        <select id="tipoAnimal" name="tipoAnimal">
+                            <option value="">Selecione</option>
+                            <option value="bovinos">Bovinos</option>
+                            <option value="bubalinos">Bubalinos</option>
+                            <option value="bovinos/bubalinos">Bovinos/Bubalinos</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="folhasRevelia">Folhas da Certidão de Revelia:</label>
+                        <input type="number" id="folhasRevelia" name="folhasRevelia" placeholder="Ex.: 10" min="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="valorUFEMG">Valor em UFEMGs:</label>
+                        <input type="number" id="valorUFEMG" name="valorUFEMG" placeholder="Calculado automaticamente" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="valorPorExtenso">Valor por Extenso:</label>
+                        <input type="text" id="valorPorExtenso" name="valorPorExtenso" placeholder="Preenchido automaticamente" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="coordenadoria">Coordenadoria Regional:</label>
+                        <input type="text" id="coordenadoria" name="coordenadoria" value="Oliveira" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="municipio">Município:</label>
+                        <input type="text" id="municipio" name="municipio" placeholder="Nome do município">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="enderecoCompleto">Endereço da Coordenadoria:</label>
+                        <textarea id="enderecoCompleto" name="enderecoCompleto" readonly>Avenida Coronel Benjamin Guimarães, 1361 - Dom Bosco
+CEP: 35540-000
+Telefone: (37) 3331 5033 - 3332 7284
+E-mail: crol@ima.mg.gov.br
+Cidade: Oliveira</textarea>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>💡 Informação</h4>
+                        <p>A multa é 25 UFEMGs por animal (Lei 10.021/1989).</p>
+                    </div>
+
+                    <button type="button" class="btn" onclick="gerarDocumentos()">🚀 Gerar Documentos</button>
+                </form>
+            </div>
+
+            <div class="documents-section">
+                <h2>📄 Documentos</h2>
+                
+                <div class="document-tabs">
+                    <button class="tab active" onclick="showDocument('decisao')">
+                        <span class="status-indicator status-incomplete" id="status-decisao"></span>
+                        Decisão Administrativa
+                    </button>
+                    <button class="tab" onclick="showDocument('oficio')">
+                        <span class="status-indicator status-incomplete" id="status-oficio"></span>
+                        Ofício de Comunicação
+                    </button>
+                </div>
+
+                <div id="doc-decisao" class="document-content active">
+                    <div class="document-preview">
+                        <div class="header-box">
+                            <h3>DECISÃO ADMINISTRATIVA</h3>
+                        </div>
+                        
+                        <p><strong>Processo:</strong> <span class="placeholder">[PROCESSO]</span></p>
+                        <p><strong>Interessado:</strong> <span class="placeholder">[INTERESSADO]</span></p>
+                        <p><strong>CPF/CNPJ nº:</strong> <span class="placeholder">[CPF/CNPJ]</span></p>
+                        <p><strong>Auto de Infração nº <span class="placeholder">[NUMERO_AUTO]</span>, de <span class="placeholder">[DATA_AUTO]</span>.</strong></p>
+                        
+                        <p>No exercício da competência a mim delegada pelo Diretor-Geral do Instituto Mineiro de Agropecuária-IMA, conforme Portaria IMA nº 2375, de 05 de maio de 2025, uma vez analisados aos autos do processo em referência e tudo achado conforme a lei e o direito, e</p>
+                        
+                        <p>Considerando que não houve apresentação de defesa ao Auto de Infração acima referenciado, e que foi lavrada a Certidão de Revelia de fls. <span class="placeholder">[FOLHAS_REVELIA]</span>,</p>
+                        
+                        <p>Considerando tratar-se de infração: <strong><em>"Deixar de vacinar animais, (<span class="placeholder">[TIPO_ANIMAL]</span>) contra febre aftosa"</em></strong>, e sendo esta a irregularidade constatada pela autoridade fiscalizadora,</p>
+                        
+                        <p>Considerando o número de animais envolvidos (<span class="placeholder">[NUM_ANIMAIS]</span> <span class="placeholder">[TIPO_ANIMAL]</span>) e a vinculação do valor de 25 UFEMGs/animal, para efeito de cálculo do valor da multa a ser aplicada, conforme § 1° do artigo 7° da Lei 10.021 de 06 de dezembro de 1989,</p>
+
+                        <div class="header-box">
+                            <strong>DECIDO PELA APLICAÇÃO DA PENALIDADE DE MULTA NO VALOR DE <span class="placeholder">[VALOR_UFEMG]</span> (<span class="placeholder">[VALOR_EXTENSO]</span>) UFEMGs.</strong>
+                        </div>
+
+                        <p class="center"><strong><span class="placeholder">[MUNICIPIO]</span>, <span class="placeholder">[DATA_DECISAO]</span>.</strong></p>
+                        
+                        <div class="center">
+                            <p>Coordenador Regional</p>
+                            <p><strong>Coordenadoria Regional de <span class="placeholder">[COORDENADORIA]</span></strong></p>
+                            <p><strong>Instituto Mineiro de Agropecuária</strong></p>
+                        </div>
+                    </div>
+                    <button class="btn download-btn" onclick="downloadDocument('decisao')">📥 Baixar Decisão (DOCX)</button>
+                </div>
+
+                <div id="doc-oficio" class="document-content">
+                    <div class="document-preview">
+                        <p><strong>OF. CR. n. ___/___</strong></p>
+                        
+                        <p><span class="placeholder">[MUNICIPIO]</span>, <span class="placeholder">[DATA_OFICIO]</span>.</p>
+                        
+                        <p><strong>Senhor(a) <span class="placeholder">[INTERESSADO]</span>,</strong></p>
+                        
+                        <p>Pelo presente, notificamos que foi <strong>JULGADO PROCEDENTE</strong> o Auto de Infração nº <span class="placeholder">[NUMERO_AUTO]</span>, de <span class="placeholder">[DATA_AUTO]</span>, nos termos do Decisão Administrativa anexo referente ao processo administrativo n° <span class="placeholder">[PROCESSO]</span>.</p>
+                        
+                        <p>Salientamos que a não apresentação de recurso à penalidade imposta no prazo de até <strong>20 (vinte) dias</strong> contados do recebimento desta comunicação, a decisão administrativa tornar-se-á definitiva.</p>
+                        
+                        <p><strong>O referido recurso deverá conter:</strong></p>
+                        
+                        <ol>
+                            <li>identificação completa do autuado ou de seu procurador com cópia do RG e CPF ou CNPJ (cópia da última alteração do contrato social);</li>
+                            <li>identificação do Auto de Infração -- número, série e data da lavratura do Auto de Infração;</li>
+                            <li>identificação do número do Processo -- número do Processo;</li>
+                            <li>cópia de comprovante de endereço urbano do autuado, emitido a menos de sessenta dias ou cópia do comprovante de endereço urbano de terceiros para recebimento de correspondência, <strong>declarado por ambas as partes</strong>;</li>
+                            <li>exposição dos fatos e considerações de forma explícita, especificando também as provas que pretende produzir. Não será considerado como recurso apenas a apresentação de documentos como a declaração de vacina, ficha sanitária ou outros;</li>
+                            <li>data e assinatura do autuado ou do seu procurador. Quando feito por procurador, é indispensável a apresentação da procuração.</li>
+                            <li>O referido recurso deverá ser endereçado a:</li>
+                        </ol>
+                        
+                        <div style="border: 1px solid #ccc; padding: 15px; margin: 20px 0;">
+                            <p><strong>Instituto Mineiro de Agropecuária</strong></p>
+                            <p>A/C Diretor-Geral do Instituto Mineiro de Agropecuária</p>
+                            <p><span class="placeholder">[ENDERECO_COMPLETO]</span></p>
+                        </div>
+                        
+                        <p><strong>Observação: Caso o autuado seja falecido, apresentar no endereço indicado acima (item 7 acima), a identificação completa do inventariante ou herdeiros (certidão de óbito, termo de inventariança OU partilha) e endereço urbano para contato.</strong></p>
+                        
+                        <p>Atenciosamente,</p>
+                        
+                        <p><strong>Coordenadoria Regional <span class="placeholder">[COORDENADORIA]</span></strong></p>
+                        <p><strong>Instituto Mineiro de Agropecuária-IMA</strong></p>
+                        <p>Carimbo / MASP / Assinatura</p>
+                        
+                        <p><strong>Ao(À) Senhor(a)</strong></p>
+                        <p><span class="placeholder">[INTERESSADO]</span></p>
+                        <p><span class="placeholder">[MUNICIPIO]</span>-MG</p>
+                    </div>
+                    <button class="btn download-btn" onclick="downloadDocument('oficio')">📥 Baixar Ofício (DOCX)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let dadosProcesso = {};
+
+        // Formatação de CPF/CNPJ
+        document.getElementById('cpfCnpj').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length <= 11) {
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            } else {
+                value = value.replace(/(\d{2})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d)/, '$1/$2');
+                value = value.replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+            }
+            e.target.value = value;
+        });
+
+        // Cálculo da multa
+        document.getElementById('numeroAnimais').addEventListener('input', function() {
+            const numAnimais = parseInt(this.value) || 0;
+            const valorTotal = numAnimais * 25;
+            document.getElementById('valorUFEMG').value = valorTotal;
+            document.getElementById('valorPorExtenso').value = numeroParaExtenso(valorTotal);
+        });
+
+        // Função para converter número para extenso
+        function numeroParaExtenso(numero) {
+            const unidades = ['', 'um', 'dois', 'três', 'quatro', 'cinco', 'seis', 'sete', 'oito', 'nove'];
+            const dezenas = ['', '', 'vinte', 'trinta', 'quarenta', 'cinquenta', 'sessenta', 'setenta', 'oitenta', 'noventa'];
+            const centenas = ['', 'cento', 'duzentos', 'trezentos', 'quatrocentos', 'quinhentos', 'seiscentos', 'setecentos', 'oitocentos', 'novecentos'];
+            const especiais = ['dez', 'onze', 'doze', 'treze', 'quatorze', 'quinze', 'dezesseis', 'dezessete', 'dezoito', 'dezenove'];
+
+            if (numero === 0) return 'zero';
+            if (numero === 100) return 'cem';
+
+            let resultado = '';
+            if (numero >= 100) {
+                resultado += centenas[Math.floor(numero / 100)];
+                numero = numero % 100;
+                if (numero > 0) resultado += ' e ';
+            }
+            if (numero >= 10 && numero <= 19) {
+                resultado += especiais[numero - 10];
+            } else {
+                if (numero >= 20) {
+                    resultado += dezenas[Math.floor(numero / 10)];
+                    numero = numero % 10;
+                    if (numero > 0) resultado += ' e ';
+                }
+                if (numero >= 1 && numero <= 9) {
+                    resultado += unidades[numero];
+                }
+            }
+            return resultado;
+        }
+
+        // Alternar entre documentos
+        function showDocument(docType) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.document-content').forEach(content => content.style.display = 'none');
+
+            event.target.classList.add('active');
+            document.getElementById('doc-' + docType).style.display = 'block';
+        }
+
+        // Gerar documentos
+        function gerarDocumentos() {
+            const form = document.getElementById('processoForm');
+            const formData = new FormData(form);
+            
+            dadosProcesso = {};
+            for (let [key, value] of formData.entries()) {
+                dadosProcesso[key] = value;
+            }
+
+            // Validação básica
+            const camposObrigatorios = ['numeroProcesso', 'interessado', 'cpfCnpj', 'numeroAuto', 'dataAuto', 'numeroAnimais', 'tipoAnimal', 'folhasRevelia', 'municipio'];
+            const camposVazios = camposObrigatorios.filter(campo => !dadosProcesso[campo]);
+            
+            if (camposVazios.length > 0) {
+                alert('Preencha todos os campos: ' + camposVazios.join(', '));
+                return;
+            }
+
+            atualizarDocumentos();
+            document.getElementById('status-decisao').className = 'status-indicator status-complete';
+            document.getElementById('status-oficio').className = 'status-indicator status-complete';
+            alert('Documentos gerados com sucesso!');
+        }
+
+        // Atualizar placeholders nos documentos
+        function atualizarDocumentos() {
+            const dataHoje = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+            const dataAuto = new Date(dadosProcesso.dataAuto).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+
+            const placeholders = {
+                '[PROCESSO]': dadosProcesso.numeroProcesso,
+                '[INTERESSADO]': dadosProcesso.interessado,
+                '[CPF/CNPJ]': dadosProcesso.cpfCnpj,
+                '[NUMERO_AUTO]': dadosProcesso.numeroAuto,
+                '[DATA_AUTO]': dataAuto,
+                '[NUM_ANIMAIS]': dadosProcesso.numeroAnimais,
+                '[TIPO_ANIMAL]': dadosProcesso.tipoAnimal,
+                '[FOLHAS_REVELIA]': dadosProcesso.folhasRevelia,
+                '[VALOR_UFEMG]': dadosProcesso.valorUFEMG,
+                '[VALOR_EXTENSO]': dadosProcesso.valorPorExtenso,
+                '[COORDENADORIA]': dadosProcesso.coordenadoria,
+                '[MUNICIPIO]': dadosProcesso.municipio,
+                '[DATA_DECISAO]': dataHoje,
+                '[DATA_OFICIO]': dataHoje,
+                '[ENDERECO_COMPLETO]': dadosProcesso.enderecoCompleto.replace(/\n/g, ', ')
+            };
+
+            document.querySelectorAll('.placeholder').forEach(el => {
+                const key = el.textContent;
+                el.textContent = placeholders[key] || key;
+                el.classList.remove('placeholder');
+            });
+        }
+
+        // Download do documento em DOCX
+        function downloadDocument(tipoDoc) {
+            if (!dadosProcesso.interessado) {
+                alert('Gere os documentos primeiro!');
+                return;
+            }
+
+            const nomes = {
+                'decisao': 'Decisão Administrativa',
+                'oficio': 'Ofício de Comunicação'
+            };
+
+            const { Document, Packer, Paragraph, TextRun, AlignmentType, BorderStyle } = docx;
+
+            const dataHoje = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+            const dataAuto = new Date(dadosProcesso.dataAuto).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+
+            let paragraphs = [];
+
+            if (tipoDoc === 'decisao') {
+                paragraphs = [
+                    new Paragraph({
+                        children: [new TextRun({ text: "DECISÃO ADMINISTRATIVA", bold: true, size: 24 })],
+                        alignment: AlignmentType.CENTER,
+                        border: { top: { style: BorderStyle.SINGLE, size: 2 }, bottom: { style: BorderStyle.SINGLE, size: 2 }, left: { style: BorderStyle.SINGLE, size: 2 }, right: { style: BorderStyle.SINGLE, size: 2 } },
+                        spacing: { before: 400, after: 400 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: `Processo: ${dadosProcesso.numeroProcesso}`, bold: true, size: 24 })],
+                        spacing: { after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: `Interessado: ${dadosProcesso.interessado}`, bold: true, size: 24 })],
+                        spacing: { after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: `CPF/CNPJ nº: ${dadosProcesso.cpfCnpj}`, bold: true, size: 24 })],
+                        spacing: { after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: `Auto de Infração nº: ${dadosProcesso.numeroAuto} de ${dataAuto}.`, bold: true, size: 24 })],
+                        spacing: { after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: "No exercício da competência a mim delegada pelo Diretor-Geral do Instituto Mineiro de Agropecuária-IMA, conforme Portaria IMA nº 2375, de 05 de maio de 2025, uma vez analisados aos autos do processo em referência e tudo achado conforme a lei e o direito, e", size: 24 })],
+                        alignment: AlignmentType.JUSTIFIED,
+                        spacing: { before: 400, after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: `Considerando que não houve apresentação de defesa ao Auto de Infração acima referenciado, e que foi lavrada a Certidão de Revelia de fls. ${dadosProcesso.folhasRevelia},`, size: 24 })],
+                        alignment: AlignmentType.JUSTIFIED,
+                        spacing: { after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: `Considerando tratar-se de infração: “Deixar de vacinar animais, (${dadosProcesso.tipoAnimal}) contra febre aftosa”, e sendo esta a irregularidade constatada pela autoridade fiscalizadora,`, bold: true, italics: true, size: 24 })],
+                        alignment: AlignmentType.JUSTIFIED,
+                        spacing: { after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: `Considerando o número de animais envolvidos (${dadosProcesso.numeroAnimais} ${dadosProcesso.tipoAnimal}) e a vinculação do valor de 25 UFEMGs/animal, para efeito de cálculo do valor da multa a ser aplicada, conforme § 1° do artigo 7° da Lei 10.021 de 06 de dezembro de 1989,`, size: 24 })],
+                        alignment: AlignmentType.JUSTIFIED,
+                        spacing: { after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: `DECIDO PELA APLICAÇÃO DA PENALIDADE DE MULTA NO VALOR DE ${dadosProcesso.valorUFEMG} (${dadosProcesso.valorPorExtenso}) UFEMGs.`, bold: true, size: 24 })],
+                        alignment: AlignmentType.CENTER,
+                        border: { top: { style: BorderStyle.SINGLE, size: 2 }, bottom: { style: BorderStyle.SINGLE, size: 2 }, left: { style: BorderStyle.SINGLE, size: 2 }, right: { style: BorderStyle.SINGLE, size: 2 } },
+                        spacing: { before: 400, after: 400 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: `${dadosProcesso.municipio}, ${dataHoje}.`, bold: true, size: 24 })],
+                        alignment: AlignmentType.CENTER,
+                        spacing: { before: 400, after: 400 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: "Coordenador Regional", bold: true, size: 24 })],
+                        alignment: AlignmentType.CENTER,
+                        spacing: { after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: `Coordenadoria Regional de ${dadosProcesso.coordenadoria}`, bold: true, size: 24 })],
+                        alignment: AlignmentType.CENTER,
+                        spacing: { after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: "Instituto Mineiro de Agropecuária", bold: true, size: 24 })],
+                        alignment: AlignmentType.CENTER
+                    })
+                ];
+            } else if (tipoDoc === 'oficio') {
+                paragraphs = [
+                    new Paragraph({
+                        children: [new TextRun({ text: "OF. CR. n. ___/___", bold: true, size: 24 })],
+                        spacing: { after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: `${dadosProcesso.municipio}, ${dataHoje}.`, size: 24 })],
+                        spacing: { after: 400 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: `Senhor(a) ${dadosProcesso.interessado},`, bold: true, size: 24 })],
+                        spacing: { after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: `Pelo presente, notificamos que foi JULGADO PROCEDENTE o Auto de Infração nº ${dadosProcesso.numeroAuto}, de ${dataAuto}, nos termos do Decisão Administrativa anexo referente ao processo administrativo n° ${dadosProcesso.numeroProcesso}.`, size: 24 })],
+                        alignment: AlignmentType.JUSTIFIED,
+                        spacing: { after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: `Salientamos que a não apresentação de recurso à penalidade imposta no prazo de até 20 (vinte) dias contados do recebimento desta comunicação, a decisão administrativa tornar-se-á definitiva.`, size: 24 })],
+                        alignment: AlignmentType.JUSTIFIED,
+                        spacing: { after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: "O referido recurso deverá conter:", bold: true, size: 24 })],
+                        spacing: { after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: "1. identificação completa do autuado ou de seu procurador com cópia do RG e CPF ou CNPJ (cópia da última alteração do contrato social);", size: 24 })],
+                        alignment: AlignmentType.JUSTIFIED,
+                        spacing: { after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: "2. identificação do Auto de Infração – número, série e data da lavratura do Auto de Infração;", size: 24 })],
+                        alignment: AlignmentType.JUSTIFIED,
+                        spacing: { after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: "3. identificação do número do Processo – número do Processo;", size: 24 })],
+                        alignment: AlignmentType.JUSTIFIED,
+                        spacing: { after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: "4. cópia de comprovante de endereço urbano do autuado, emitido a menos de sessenta dias ou cópia do comprovante de endereço urbano de terceiros para recebimento de correspondência, declarado por ambas as partes;", bold: true, size: 24 })],
+                        alignment: AlignmentType.JUSTIFIED,
+                        spacing: { after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: "5. exposição dos fatos e considerações de forma explícita, especificando também as provas que pretende produzir. Não será considerado como recurso apenas a apresentação de documentos como a declaração de vacina, ficha sanitária ou outros;", size: 24 })],
+                        alignment: AlignmentType.JUSTIFIED,
+                        spacing: { after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: "6. data e assinatura do autuado ou do seu procurador. Quando feito por procurador, é indispensável a apresentação da procuração;", size: 24 })],
+                        alignment: AlignmentType.JUSTIFIED,
+                        spacing: { after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: "7. O referido recurso deverá ser endereçado a:", size: 24 })],
+                        alignment: AlignmentType.JUSTIFIED,
+                        spacing: { after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: "Instituto Mineiro de Agropecuária", bold: true, size: 24 })],
+                        spacing: { after: 200 },
+                        border: { top: { style: BorderStyle.SINGLE, size: 1 }, bottom: { style: BorderStyle.SINGLE, size: 1 }, left: { style: BorderStyle.SINGLE, size: 1 }, right: { style: BorderStyle.SINGLE, size: 1 } }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: "A/C Diretor-Geral do Instituto Mineiro de Agropecuária", size: 24 })],
+                        spacing: { after: 200 },
+                        border: { bottom: { style: BorderStyle.SINGLE, size: 1 }, left: { style: BorderStyle.SINGLE, size: 1 }, right: { style: BorderStyle.SINGLE, size: 1 } }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: dadosProcesso.enderecoCompleto.replace(/\n/g, ', '), size: 24 })],
+                        spacing: { after: 200 },
+                        border: { bottom: { style: BorderStyle.SINGLE, size: 1 }, left: { style: BorderStyle.SINGLE, size: 1 }, right: { style: BorderStyle.SINGLE, size: 1 } }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: "Observação: Caso o autuado seja falecido, apresentar no endereço indicado acima (item 7 acima), a identificação completa do inventariante ou herdeiros (certidão de óbito, termo de inventariança OU partilha) e endereço urbano para contato.", bold: true, size: 24 })],
+                        alignment: AlignmentType.JUSTIFIED,
+                        spacing: { after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: "Atenciosamente,", size: 24 })],
+                        spacing: { after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: `Coordenadoria Regional ${dadosProcesso.coordenadoria}`, bold: true, size: 24 })],
+                        spacing: { after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: "Instituto Mineiro de Agropecuária-IMA", bold: true, size: 24 })],
+                        spacing: { after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: "Carimbo / MASP / Assinatura", size: 24 })],
+                        spacing: { after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: "Ao(À) Senhor(a)", bold: true, size: 24 })],
+                        spacing: { after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: dadosProcesso.interessado, size: 24 })],
+                        spacing: { after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [new TextRun({ text: `${dadosProcesso.municipio}-MG`, size: 24 })]
+                    })
+                ];
+            }
+
+            const doc = new Document({
+                sections: [{
+                    properties: {
+                        page: {
+                            margin: {
+                                top: 1440, // 2,54 cm
+                                bottom: 1440,
+                                left: 1440,
+                                right: 1440
+                            }
+                        }
+                    },
+                    children: paragraphs
+                }]
+            });
+
+            Packer.toBlob(doc).then(blob => {
+                saveAs(blob, `${nomes[tipoDoc]} - ${dadosProcesso.interessado} - Auto ${dadosProcesso.numeroAuto}.docx`);
+            }).catch(err => {
+                console.error('Erro ao gerar DOCX:', err);
+                alert('Erro ao gerar o documento. Verifique o console para detalhes.');
+            });
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('dataAuto').value = new Date().toISOString().split('T')[0];
+        });
+    </script>
+</body>
+</html>
+```
