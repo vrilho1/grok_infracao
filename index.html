@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -186,17 +187,6 @@
             background-color: #d3d3d3;
         }
 
-        .endereco-box {
-            border: 1px solid #ccc;
-            padding: 15px;
-            margin: 20px 0;
-            line-height: 1.2;
-        }
-
-        .endereco-box p {
-            margin: 2px 0;
-        }
-
         .download-btn {
             background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
             margin-top: 15px;
@@ -321,13 +311,8 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="municipioLavratura">Município de Lavratura:</label>
-                        <input type="text" id="municipioLavratura" name="municipioLavratura" placeholder="Nome do município de lavratura">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="municipioDestino">Município de Destino:</label>
-                        <input type="text" id="municipioDestino" name="municipioDestino" placeholder="Nome do município de destino">
+                        <label for="municipio">Município:</label>
+                        <input type="text" id="municipio" name="municipio" placeholder="Nome do município">
                     </div>
 
                     <div class="form-group">
@@ -383,7 +368,7 @@ Cidade: Oliveira</textarea>
 
                         <p class="center bold">DECIDO PELA APLICAÇÃO DA PENALIDADE DE MULTA NO VALOR DE <span class="placeholder">[VALOR_UFEMG]</span> (<span class="placeholder">[VALOR_EXTENSO]</span>) UFEMGs.</p>
 
-                        <p class="center"><strong><span class="placeholder">[MUNICIPIO_LAVRATURA]</span>, <span class="placeholder">[DATA_DECISAO]</span>.</strong></p>
+                        <p class="center"><strong><span class="placeholder">[MUNICIPIO]</span>, <span class="placeholder">[DATA_DECISAO]</span>.</strong></p>
                         
                         <div class="center">
                             <p>Coordenador Regional</p>
@@ -398,7 +383,7 @@ Cidade: Oliveira</textarea>
                     <div class="document-preview">
                         <p><strong>OF. CR. n. ___/___</strong></p>
                         
-                        <p><span class="placeholder">[MUNICIPIO_LAVRATURA]</span>, <span class="placeholder">[DATA_OFICIO]</span>.</p>
+                        <p><span class="placeholder">[MUNICIPIO]</span>, <span class="placeholder">[DATA_OFICIO]</span>.</p>
                         
                         <p><strong>Senhor(a) <span class="placeholder">[INTERESSADO]</span>,</strong></p>
                         
@@ -418,7 +403,7 @@ Cidade: Oliveira</textarea>
                             <li>O referido recurso deverá ser endereçado a:</li>
                         </ol>
                         
-                        <div class="endereco-box">
+                        <div style="border: 1px solid #ccc; padding: 15px; margin: 20px 0;">
                             <p><strong>Instituto Mineiro de Agropecuária</strong></p>
                             <p>A/C Diretor-Geral do Instituto Mineiro de Agropecuária</p>
                             <p><span class="placeholder">[ENDERECO_COMPLETO]</span></p>
@@ -434,7 +419,7 @@ Cidade: Oliveira</textarea>
                         
                         <p><strong>Ao(À) Senhor(a)</strong></p>
                         <p><span class="placeholder">[INTERESSADO]</span></p>
-                        <p><span class="placeholder">[MUNICIPIO_DESTINO]</span>-MG</p>
+                        <p><span class="placeholder">[MUNICIPIO]</span>-MG</p>
                     </div>
                     <button class="btn download-btn" onclick="downloadDocument('oficio')">📥 Baixar Ofício (DOCX)</button>
                 </div>
@@ -500,17 +485,6 @@ Cidade: Oliveira</textarea>
             return resultado;
         }
 
-        // Função para formatar data no formato brasileiro
-        function formatarDataBrasileira(dataStr) {
-            if (!dataStr) return '';
-            const [ano, mes, dia] = dataStr.split('-');
-            const meses = [
-                'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
-                'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'
-            ];
-            return `${parseInt(dia)} de ${meses[parseInt(mes) - 1]} de ${ano}`;
-        }
-
         // Alternar entre documentos
         function showDocument(docType) {
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
@@ -531,7 +505,7 @@ Cidade: Oliveira</textarea>
             }
 
             // Validação básica
-            const camposObrigatorios = ['numeroProcesso', 'interessado', 'cpfCnpj', 'numeroAuto', 'dataAuto', 'numeroAnimais', 'tipoAnimal', 'folhasRevelia', 'municipioLavratura', 'municipioDestino'];
+            const camposObrigatorios = ['numeroProcesso', 'interessado', 'cpfCnpj', 'numeroAuto', 'dataAuto', 'numeroAnimais', 'tipoAnimal', 'folhasRevelia', 'municipio'];
             const camposVazios = camposObrigatorios.filter(campo => !dadosProcesso[campo]);
             
             if (camposVazios.length > 0) {
@@ -547,8 +521,8 @@ Cidade: Oliveira</textarea>
 
         // Atualizar placeholders nos documentos
         function atualizarDocumentos() {
-            const dataHoje = formatarDataBrasileira(new Date().toISOString().split('T')[0]);
-            const dataAuto = formatarDataBrasileira(dadosProcesso.dataAuto);
+            const dataHoje = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+            const dataAuto = new Date(dadosProcesso.dataAuto).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
 
             const placeholders = {
                 '[PROCESSO]': dadosProcesso.numeroProcesso,
@@ -562,8 +536,7 @@ Cidade: Oliveira</textarea>
                 '[VALOR_UFEMG]': dadosProcesso.valorUFEMG,
                 '[VALOR_EXTENSO]': dadosProcesso.valorPorExtenso,
                 '[COORDENADORIA]': dadosProcesso.coordenadoria,
-                '[MUNICIPIO_LAVRATURA]': dadosProcesso.municipioLavratura,
-                '[MUNICIPIO_DESTINO]': dadosProcesso.municipioDestino,
+                '[MUNICIPIO]': dadosProcesso.municipio,
                 '[DATA_DECISAO]': dataHoje,
                 '[DATA_OFICIO]': dataHoje,
                 '[ENDERECO_COMPLETO]': dadosProcesso.enderecoCompleto
@@ -571,20 +544,8 @@ Cidade: Oliveira</textarea>
 
             document.querySelectorAll('.placeholder').forEach(el => {
                 const key = el.textContent;
-                if (key === '[ENDERECO_COMPLETO]') {
-                    const linhas = placeholders[key].split('\n');
-                    const p = document.createElement('p');
-                    linhas.forEach((linha, index) => {
-                        const span = document.createElement('span');
-                        span.textContent = linha.trim();
-                        p.appendChild(span);
-                        if (index < linhas.length - 1) p.appendChild(document.createElement('br'));
-                    });
-                    el.parentNode.replaceChild(p, el);
-                } else {
-                    el.textContent = placeholders[key] || key;
-                    el.classList.remove('placeholder');
-                }
+                el.textContent = placeholders[key] || key;
+                el.classList.remove('placeholder');
             });
         }
 
@@ -595,12 +556,6 @@ Cidade: Oliveira</textarea>
                 return;
             }
 
-            if (typeof docx === 'undefined' || typeof saveAs === 'undefined') {
-                console.error('Bibliotecas docx ou FileSaver não carregadas.');
-                alert('Erro: Bibliotecas necessárias não foram carregadas. Verifique o console e tente novamente.');
-                return;
-            }
-
             const nomes = {
                 'decisao': 'Decisão Administrativa',
                 'oficio': 'Ofício de Comunicação'
@@ -608,8 +563,8 @@ Cidade: Oliveira</textarea>
 
             const { Document, Packer, Paragraph, TextRun, AlignmentType, BorderStyle, ShadingType } = docx;
 
-            const dataHoje = formatarDataBrasileira(new Date().toISOString().split('T')[0]);
-            const dataAuto = formatarDataBrasileira(dadosProcesso.dataAuto);
+            const dataHoje = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+            const dataAuto = new Date(dadosProcesso.dataAuto).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
 
             let paragraphs = [];
 
@@ -664,7 +619,7 @@ Cidade: Oliveira</textarea>
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: `${dadosProcesso.municipioLavratura}, ${dataHoje}.`, bold: true, size: 24, font: "Calibri" })],
+                        children: [new TextRun({ text: `${dadosProcesso.municipio}, ${dataHoje}.`, bold: true, size: 24, font: "Calibri" })],
                         alignment: AlignmentType.CENTER,
                         spacing: { before: 240, after: 240 }
                     }),
@@ -692,7 +647,7 @@ Cidade: Oliveira</textarea>
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: `${dadosProcesso.municipioLavratura}, ${dataHoje}.`, size: 24, font: "Calibri" })],
+                        children: [new TextRun({ text: `${dadosProcesso.municipio}, ${dataHoje}.`, size: 24, font: "Calibri" })],
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
@@ -754,17 +709,17 @@ Cidade: Oliveira</textarea>
                     }),
                     new Paragraph({
                         children: [new TextRun({ text: "Instituto Mineiro de Agropecuária", bold: true, size: 24, font: "Calibri" })],
-                        spacing: { before: 120, after: 120 },
+                        spacing: { before: 240, after: 240 },
                         border: { top: { style: BorderStyle.SINGLE, size: 2 }, bottom: { style: BorderStyle.SINGLE, size: 2 }, left: { style: BorderStyle.SINGLE, size: 2 }, right: { style: BorderStyle.SINGLE, size: 2 } }
                     }),
                     new Paragraph({
                         children: [new TextRun({ text: "A/C Diretor-Geral do Instituto Mineiro de Agropecuária", size: 24, font: "Calibri" })],
-                        spacing: { before: 120, after: 120 },
+                        spacing: { before: 240, after: 240 },
                         border: { bottom: { style: BorderStyle.SINGLE, size: 2 }, left: { style: BorderStyle.SINGLE, size: 2 }, right: { style: BorderStyle.SINGLE, size: 2 } }
                     }),
                     ...dadosProcesso.enderecoCompleto.split('\n').map(linha => new Paragraph({
                         children: [new TextRun({ text: linha.trim(), size: 24, font: "Calibri" })],
-                        spacing: { before: 120, after: 120 },
+                        spacing: { before: 240, after: 240 },
                         border: { bottom: { style: BorderStyle.SINGLE, size: 2 }, left: { style: BorderStyle.SINGLE, size: 2 }, right: { style: BorderStyle.SINGLE, size: 2 } }
                     })),
                     new Paragraph({
@@ -797,7 +752,7 @@ Cidade: Oliveira</textarea>
                         spacing: { before: 240, after: 240 }
                     }),
                     new Paragraph({
-                        children: [new TextRun({ text: `${dadosProcesso.municipioDestino}-MG`, size: 24, font: "Calibri" })],
+                        children: [new TextRun({ text: `${dadosProcesso.municipio}-MG`, size: 24, font: "Calibri" })],
                         spacing: { before: 240, after: 240 }
                     })
                 ];
@@ -823,7 +778,7 @@ Cidade: Oliveira</textarea>
                 saveAs(blob, `${nomes[tipoDoc]} - ${dadosProcesso.interessado} - Auto ${dadosProcesso.numeroAuto}.docx`);
             }).catch(err => {
                 console.error('Erro ao gerar DOCX:', err);
-                alert('Erro ao gerar o documento. Verifique o console para detalhes.');
+                alert('Erro ao gerar o documento. Verifique o console.');
             });
         }
 
